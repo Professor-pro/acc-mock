@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Quiz Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .result-container {
+        display: none;
+        /* Other styling properties */
+        position: fixed; /* or absolute, depending on your layout */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+        z-index: 10; /* Ensure it's on top of everything */
+        overflow-y: auto; /* In case the content is too long */
+        padding: 20px;
+        text-align: center;
+      }
+      .result-content {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px auto; /* Center the content */
+        max-width: 800px; /* Adjust as needed */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add some shadow for better visibility */
+      }
+      #start-page {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 11;
+      }
+      #start-page-content {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        max-width: 800px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+    </style>
+</head>
+<body class="bg-white vsc-initialized">
+    <div id="start-page">
+      <div id="start-page-content">
+        <h2 class="text-2xl font-bold mb-4 text-gray-900">Welcome to the Mock Quiz</h2>
+        <p class="mb-4 text-gray-700">This quiz contains 50 questions and you will have 60 minutes to complete it.</p>
+        <button id="start-quiz-button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Start Quiz</button>
+      </div>
+    </div>
+    <div class="container mx-auto p-2 h-screen" style="display: none;"> 
+        <div class="flex h-full">
+            <div class="w-4/5 flex flex-col">
+                <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm mb-4 flex-none">
+                    <div class="text-lg font-bold text-gray-900">Test</div>
+                    <div class="flex items-center">
+                        <div class="mr-4 text-gray-900" id="timer-display">Time Left : 60:00</div>
+                        <button 
+                            onclick="window.open('https://t.me/cuetchampion', '_blank')" 
+                            class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
+                            Help
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg mb-4 h-[calc(100vh-160px)] overflow-y-auto shadow-sm flex-grow">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-blue-500 text-white px-4 py-2 rounded-lg" id="question-category">QA</div>
+                    </div>
+                    <div class="mb-6">
+                        <div class="font-bold mb-2 text-gray-900" id="question-number">Question No. 1</div>
+                        <p class="text-xl leading-relaxed text-gray-700 mb-4" id="question-text">Anu, Vinu and Manu can complete a work alone in 15 days, 12 days and 20 days, respectively. Vinu works everyday. Anu works only on alternate days starting from the first day while Manu works only on alternate days starting from the second day. Then, the number of days needed to complete the work is</p>
+                        <div class="space-y-3" id="options"></div>
+                    </div>
+                </div>
+                <div class="w-full px-6 pb-4 flex justify-between flex-none">
+                    <div class="space-x-2">
+                        <button class="bg-gray-200 hover:bg-gray-300 transition px-4 py-2 rounded text-gray-900" id="markReviewNext">Mark for Review &amp; Next</button>
+                        <button class="bg-gray-200 hover:bg-gray-300 transition px-4 py-2 rounded text-gray-900" id="clearResponse">Clear Response</button>
+                    </div>
+                    <div class="space-x-2">
+                        <button class="bg-gray-200 hover:bg-gray-300 transition px-4 py-2 rounded text-gray-900" id="prevBtn">Previous</button>
+                        <button class="bg-blue-500 hover:bg-blue-600 transition text-white px-4 py-2 rounded" id="saveNext">Save &amp; Next</button>
+                        <button class="bg-blue-500 hover:bg-blue-600 transition text-white px-4 py-2 rounded" id="submitBtn">Submit</button> 
+                    </div>
+                </div>
+            </div>
+            <div class="w-1/5">
+                <div class="bg-white p-6 rounded-lg sticky top-4 shadow-sm">
+                    <h2 class="text-xl font-bold mb-4 text-gray-900">Navigation</h2>
+                    <div class="grid grid-cols-5 gap-2 mb-4" id="nav-grid">
+                        <button class="nav-btn bg-red-500 hover:opacity-75 transition text-white p-2 rounded" data-index="0">1</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="1">2</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="2">3</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="3">4</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="4">5</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="5">6</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="6">7</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="7">8</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="8">9</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="9">10</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="10">11</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="11">12</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="12">13</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="13">14</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="14">15</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="15">16</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="16">17</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="17">18</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="18">19</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="19">20</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="20">21</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="21">22</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="22">23</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="23">24</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="24">25</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="25">26</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="26">27</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="27">28</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="28">29</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="29">30</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="30">31</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="31">32</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="32">33</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="33">34</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="34">35</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="35">36</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="36">37</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="37">38</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="38">39</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="39">40</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="40">41</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="41">42</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="42">43</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="43">44</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="44">45</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="45">46</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="46">47</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="47">48</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="48">49</button>
+                        <button class="nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded" data-index="49">50</button>
+                    </div>
+                    <div class="mb-4">
+                        <div class="flex items-center mb-2">
+                            <div class="w-4 h-4 bg-red-500 rounded-full mr-2"></div>
+                            <span class="text-gray-900">Not Attempted</span>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <div class="w-4 h-4 bg-green-500 rounded-full mr-2"></div>
+                            <span class="text-gray-900">Answered</span>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <div class="w-4 h-4 bg-purple-500 rounded-full mr-2"></div>
+                            <span class="text-gray-900">Marked for Review</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 bg-gray-200 rounded-full mr-2"></div>
+                            <span class="text-gray-900">Not Visited</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
+                        <button class="bg-gray-200 hover:bg-gray-300 transition px-4 py-2 rounded text-gray-900" id="nav-prev">Prev</button>
+                        <button class="bg-blue-500 hover:bg-blue-600 transition text-white px-4 py-2 rounded" id="nav-next">Next</button>
+                        <button id="pause-button" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">Pause</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="result-container" id="results-page">
+      <div class="result-content">
+        <h2 class="text-2xl font-bold mb-4 text-gray-900">Quiz Results</h2>
+        <div id="results-summary" class="mb-6 text-lg text-gray-700"></div>
+        <div id="results-details" class="mb-6 text-gray-700"></div>
+        <button onclick="resetQuiz()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Go Back to Start</button>
+      </div>
+    </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const startPageEl = document.getElementById("start-page");
+        const quizContainerEl = document.querySelector(".container");
+        const startQuizButton = document.getElementById("start-quiz-button");
+        const questions = [
+            {
+    "id": 1,
+    "category": "Accountancy",
+    "text": "Anshu and Nitu are partners, sharing profits in the ratio of 3:2. They admitted Jyoti as a new partner for 3/10 share which she acquired 2/10 from Anshu and 1/10 from Nitu. Calculate the new profit sharing ratio of Anshu, Nitu and Jyoti.",
+    "options": ["4:3:3", "3:4:3", "3:3:4", "3:2:1"],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "4"
+  },
+  {
+    "id": 2,
+    "category": "Accountancy",
+    "text": "The journal entry for treatment of goodwill, when a new partner brings his share of goodwill in cash and one of the old partners gains, involves the following:\n(A) Gaining Partner's Capital Account is debited\n(B) Premium for Goodwill Account is debited\n(C) Sacrificing Partner's Capital Account is credited\n(D) Gaining Partner's Capital Account is credited\nChoose the correct answer from the options given below :",
+    "options": ["(A), (B) and (D) only", "(A), (B) and (C) only", "(A), (B), (C) and (D)", "(B), (C) and (D) only"],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "2"
+  },
+  {
+    "id": 3,
+    "category": "Accountancy",
+    "text": "Match List-I with List-II.\n\nList-I\n(Equal amount of drawings made)\n(A) At the end of each half year\n(B) At the beginning of each quarter\n(C) At the beginning of each month\n(D) At the end of each quarter\n\nList-II\n(Number of month for which interest calculated)\n(I) 4.5 months\n(II) 6.5 months\n(III) 7.5 months\n(IV) 3 months\nChoose the correct answer from the options given below :",
+    "options": [
+      "(A) - (I), (B) - (II), (C) - (III), (D) - (IV)",
+      "(A) - (I), (B) - (III), (C) - (II), (D) - (IV)",
+      "(A) - (IV), (B) - (II), (C) - (I), (D) - (III)",
+      "(A) - (IV), (B) - (III), (C) - (II), (D) - (I)"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "4"
+  },
+  {
+    "id": 4,
+    "category": "Accountancy",
+    "text": "Kavita and Lalita are partners, sharing profits in the ratio of 2: 1. They decide to admit Mohan for 1/4th share in future profits with a guaranteed amount of ₹25,000. Both Kavita and Lalita undertake to meet the liability arising due to the guaranteed amount to Mohan in their respective profit sharing ratio. The firm earned profits of ₹76,000 for the year 2022-23. The deficiency borne by Kavita is:",
+    "options": ["₹4,000", "₹2,000", "₹6,000", "₹4,500"],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1"
+  },
+  {
+    "id": 5,
+    "category": "Accountancy",
+    "text": "While preparing Cash Flow Statement, purchase of goodwill is treated as:",
+    "options": [
+      "Operating activity",
+      "Financing activity",
+      "Investing activity",
+      "Exraordinary item"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "3"
+  },
+  {
+    "id": 6,
+    "category": "Accountancy",
+    "text": "The components of Computerised Accounting System are :",
+    "options": [
+      "Data, Report, Ledger, Hardware, Software",
+      "Data, People, Procedure, Hardware, Software",
+      "People, Procedure, Ledger, Data, Chart of Accounts",
+      "Data, Coding, Procedure, Rules, Output"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "2"
+  },
+  {
+    "id": 7,
+    "category": "Accountancy",
+    "text": "The Sales and Accounts Receivable Subsystem deals with:",
+    "options": [
+      "the recording of Sales, maintaining of Sales Ledger and Receivables",
+      "the preparation of Budget for the coming financial year",
+      "the preparation of Profit and Loss Account, Balance Sheet and Cash Flow Statement",
+      "the purchase and payment to creditors"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1"
+  },
+  {
+    "id": 8,
+    "category": "Accountancy",
+    "text": "The common fields used in a relationship between tables are called :",
+    "options": ["Joint fields", "Main fields", "Table fields", "Key fields"],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "4"
+  },
+  {
+    "id": 9,
+    "category": "Accountancy",
+    "text": "On dissolution of a firm, bank overdraft is transferred to :",
+    "options": [
+      "Bank Account",
+      "Realisation Account",
+      "Partners' Capital Account",
+      "Partners' Loan Account"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "2"
+  },
+  {
+    "id": 10,
+    "category": "Accountancy",
+    "text": "Arrange the following steps in the correct sequence of the life of a company :\n(A) Commencement of Business (B) Incorporation (C) Promotion (D) Floatation\nChoose the correct answer from the options given below :",
+    "options": [
+      "(A), (B), (C), (D)",
+      "(A), (C), (B), (D)",
+      "(B), (A), (D), (C)",
+      "(C), (B), (D), (A)"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "4"
+  },
+  {
+    "id": 11,
+    "category": "Accountancy",
+    "text": "Arrange the following in the correct order :\n(A) Subscribed Capital (B) Issued Capital (C) Authorised Capital (D) Paid-up Capital (E) Called-up Capital\nChoose the correct answer from the options given below :",
+    "options": [
+      "(C), (B), (A), (D), (E)",
+      "(B), (C), (A), (D), (E)",
+      "(C), (B), (A), (E), (D)",
+      "(B), (C), (A), (E), (D)"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "3"
+  },
+  {
+    "id": 12,
+    "category": "Accountancy",
+    "text": "The Deceased Partner's Capital Account includes the following amount/balances :\n(A) Opening balance of his capital (B) His share of profit/loss till the date of death (C) His share of General Reserve (D) His drawings till the date of death (E) Amount paid to his executors\nChoose the correct answer from the options given below :",
+    "options": [
+      "(A), (B), (D) and (E) only",
+      "(A), (B), (C) and (D) only",
+      "(A), (B) and (C) only",
+      "(A), (B), (C) and (E) only"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "2"
+  },
+  {
+    "id": 13,
+    "category": "Accountancy",
+    "text": "Identify the correct sequence of the following steps involved in calculating cash flows from operating activities of a company:\n(A) Operating profit before working capital changes (B) Cash generated from operations (C) Income tax paid (D) Net cash flow from operating activities (E) Goodwill amortised\nChoose the correct answer from the options given below :",
+    "options": [
+      "(E), (C), (D), (A), (B)",
+      "(E), (A), (D), (B), (C)",
+      "(E), (A), (B), (C), (D)",
+      "(A), (B), (C), (D), (E)"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1"
+  },
+  {
+    "id": 14,
+    "category": "Accountancy",
+    "text": "Calculate Trade Receivables Turnover Ratio.",
+    "options": ["8.18 times", "8.23:1", "8.18%", "8.81:1"],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "2"
+  },
+  {
+    "id": 15,
+    "category": "Accountancy",
+    "text": "Calculate Average Collection Period.",
+    "options": ["30 days", "60 days", "45 days", "15 days"],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1"
+  },
+  {
+    "id": 16,
+    "category": "Accountancy",
+    "text": "Calculate Trade Payables Turnover Ratio.",
+    "options": ["29.6 times", "2.96 times", "29.6%", "2.69:1"],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1"
+  },
+  {
+    "id": 17,
+    "category": "Accountancy",
+    "text": "Calculate Average Payment Period.",
+    "options": ["123 days", "121 days", "132 days", "133 days"],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "2"
+  },
+  {
+    "id": 18,
+    "category": "Accountancy",
+    "text": "Trade Receivables Turnover Ratio and Trade Payables Turnover Ratio are categorised as:",
+    "options": [
+      "Liquidity Ratio",
+      "Solvency Ratio",
+      "Activity Ratio",
+      "Profitability Ratio"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "3"
+  },
+  {
+    "id": 19,
+    "category": "Accountancy",
+    "text": "What is the mode of dissolution of the firm followed by G, K and B?",
+    "options": [
+      "Dissolution by Agreement",
+      "On the happening of certain contingencies",
+      "Dissolution by Notice",
+      "Compulsory Dissolution"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "2"
+  },
+  {
+    "id": 20,
+    "category": "Accountancy",
+    "text": "Determine the amount of Profit and Loss Account.",
+    "options": ["(Cr.) ₹90,000", "(Dr.) ₹90,000", "(Cr.) ₹1,30,000", "(Dr.) ₹1,30,000"],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1"
+  },
+  {
+    "id": 21,
+    "category": "Accountancy",
+    "text": "Determine Gain/Loss on Realisation.",
+    "options": [
+      "Loss ₹2,40,000",
+      "Gain ₹24,000",
+      "Loss ₹1,70,000",
+      "Loss ₹2,10,000"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1,2"
+  },
+  {
+    "id": 22,
+    "category": "Accountancy",
+    "text": "The entry for realisation expenses in above case study will be :",
+    "options": [
+      "Realisation A/c Dr. To Cash A/c",
+      "Realisation A/c Dr. To G's Capital A/c",
+      "G's Capital A/c Dr. To Realisation A/c",
+      "Cash A/c Dr. To Realisation A/c"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "2"
+  },
+  {
+    "id": 23,
+    "category": "Accountancy",
+    "text": "Existing Profit and Loss Account in the books of the firm will be shared/borne by partners in the ratio :",
+    "options": ["5:3:2", "Equal Ratio", "4:3:2", "Ratio of closing capital claims"],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1"
+  },
+  {
+    "id": 24,
+    "category": "Accountancy",
+    "text": "Libraries run by charitable trusts are an example of:",
+    "options": [
+      "Partnership",
+      "Not for profit organisation",
+      "Companies",
+      "Cooperatives"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "2"
+  },
+  {
+    "id": 25,
+    "category": "Accountancy",
+    "text": "The main source of revenue for 'not for profit organisation is :",
+    "options": [
+      "Sale of goods",
+      "Sale of periodicals",
+      "Subscription from members",
+      "Sale of assets"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "3"
+  },
+  {
+    "id": 26,
+    "category": "Accountancy",
+    "text": "Match List-I with List-II.\n\nList-I\n(A) Share capital\n(B) Reserves and surplus\n(C) Reserve capital\n(D) Current liabilities\n\nList-II\n(I) Will be called at the time of winding up\n(II) Calls in advance\n(III) Subscribed but not fully paid\n(IV) Sinking fund\nChoose the correct answer from the options given below :",
+    "options": [
+      "(A) - (I), (B) - (II), (C) - (III), (D) - (IV)",
+      "(A) - (I), (B) - (III), (C) - (II), (D) - (IV)",
+      "(A) - (I), (B) - (II), (C) - (IV), (D) - (III)",
+      "(A) - (III), (B) - (IV), (C) - (I), (D) - (II)"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "4"
+  },
+  {
+    "id": 27,
+    "category": "Accountancy",
+    "text": "Which of the following would affect the Revaluation Account at the time of reconstitution of a partnership firm?",
+    "options": [
+      "Increase in assets",
+      "Drawings against capital",
+      "Interest on capital",
+      "Parntner's salary"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1"
+  },
+  {
+    "id": 28,
+    "category": "Accountancy",
+    "text": "Identify the correct sequence to be followed while preparing of final account of a partnership firm :\n(A) Profit and Loss Appropriation Account (B) Profit and Loss Account (C) Trading Account (D) Balance Sheet\nChoose the correct answer from the options given below :",
+    "options": [
+      "(C), (B), (A), (D)",
+      "(A), (C), (B), (D)",
+      "(B), (A), (D), (C)",
+      "(C), (B), (D), (A)"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1"
+  },
+  {
+    "id": 29,
+    "category": "Accountancy",
+    "text": "Window dressing is a practice",
+    "options": [
+      "to manipulate the accounts to show a better picture of the financial position than the actual one.",
+      "to show excesive depreciaton.",
+      "to avoid tax.",
+      "to reduce tax."
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1"
+  },
+  {
+    "id": 30,
+    "category": "Accountancy",
+    "text": "Match List-I with List-II.\n\nList-I\n(A) Salary to partner\n(B) Interest on partner's loan\n(C) Interest on partner's drawings\n(D) Additional capital introduced\n\nList-II\n(I) Credit side of Partner's Capital Account\n(II) Debit side of Partner's Current Accont\n(III) Debit side of Profit and Loss Account\n(IV) Credit side of Partner's Current Account\nChoose the correct answer from the options given below :",
+    "options": [
+      "(A) - (I), (B) - (II), (C) - (III), (D) - (IV)",
+      "(A) - (I), (B) - (III), (C) - (II), (D) - (IV)",
+      "(A) - (IV), (B) - (III), (C) - (II), (D) - (I)",
+      "(A) - (III), (B) - (IV), (C) - (I), (D) - (II)"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "2"
+  },
+  {
+    "id": 31,
+    "category": "Accountancy",
+    "text": "Which of the following would affect the Revaluation Account at the time of admission of a partner ?\n(A) Increase in assets (B) Drawings against capital (C) Recording of unrecorded assets (D) Decrease in liabilities\nChoose the correct answer from the options given below :",
+    "options": [
+      "(A), (B) and (C) only",
+      "(A), (B) and (D) only",
+      "(A), (C) and (D) only",
+      "(B), (C) and (D) only"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "3"
+  },
+  {
+    "id": 32,
+    "category": "Accountancy",
+    "text": "Match List-I with List-II.\n\nList-I\n(Items of cash flow)\n(A) Purchase of tangible assets\n(B) Issue of shares\n(C) Increase in current assets\n(D) Marketable securities\n\nList-II\n(Type of activity)\n(I) Operating activity\n(II) Cash and cash equivalents\n(III) Investing activity\n(IV) Financing activity\nChoose the correct answer from the options given below :",
+    "options": [
+      "(A) - (I), (B) - (II), (C) - (III), (D) - (IV)",
+      "(A) - (I), (B) - (III), (C) - (II), (D) - (IV)",
+      "(A) - (I), (B) - (II), (C) - (IV), (D) - (III)",
+      "(A) - (III), (B) - (IV), (C) - (I), (D) - (II)"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "4"
+  },
+  {
+    "id": 33,
+    "category": "Accountancy",
+    "text": "Which one of the following are correct in connection with the Common Size Statement?\n(A) Expressed as a percentage on revenue from operation (B) Horizontal analysis (C) Vertical analysis (D) Expressed as a percentage on total assets\nChoose the correct answer from the options given below :",
+    "options": [
+      "(A), (B) and (D) only",
+      "(A), (B) and (C) only",
+      "(A), (C) and (D) only",
+      "(B), (C) and (D) only"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "3"
+  },
+  {
+    "id": 34,
+    "category": "Accountancy",
+    "text": "Calculate the resulting cash flow and state the nature of cash flow from the following information: Acquired machinery for ₹3,50,000 by issuing cheque.",
+    "options": [
+      "Investing activity and outflow ₹3,50,000",
+      "Investing activity and inflow ₹3,50,000",
+      "Investing activity and no flow",
+      "Operating activity and outflow ₹3,50,000"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1"
+  },
+  {
+    "id": 35,
+    "category": "Accountancy",
+    "text": "Arrange the following in proper sequence while preparing Cash Flow Statement:\n(A) Net cash flow from operating activities (B) Cash flow from financing activities (C) Cash flow from investing activities (D) Calculate net profit before tax and extraordinary items in working note\nChoose the correct answer from the options given below :",
+    "options": [
+      "(A), (B), (C), (D)",
+      "(D), (A), (C), (B)",
+      "(B), (A), (D), (C)",
+      "(C), (B), (D), (A)"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "2"
+  },
+  {
+    "id": 36,
+    "category": "Accountancy",
+    "text": "The adjustment required for overvaluation of closing stock, while calculating adjusted profit for calculating goodwill is\n(A) reduction from concerned year's profit. (B) reduction from next year's profit. (C) addition to next year's profit. (D) addition to previous year's profit.\nChoose the correct answer from the options given below :",
+    "options": [
+      "(A), (B) and (D) only",
+      "(A) and (C) only",
+      "(A) and (D) only",
+      "(B), (C) and (D) only"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1,2"
+  },
+  {
+    "id": 37,
+    "category": "Accountancy",
+    "text": "Oversubscription is a situation where the",
+    "options": [
+      "number of shares applied for is equal to the number of shares issued.",
+      "number of shares applied for is more than the number of shares issued.",
+      "number of shares applied for is less than the number of shares issued.",
+      "face value of the share is less than the issue price of the share."
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "2"
+  },
+  {
+    "id": 38,
+    "category": "Accountancy",
+    "text": "400 shares of ₹50 each issued at par were forfeited for non-payment of final call of ₹10 per share. These shares were reissued at 45 per share as fully paid-up. The amount transferred to capital reserve is :",
+    "options": ["₹15,000", "₹14,000", "₹16,000", "₹13,000"],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "3"
+  },
+  {
+    "id": 39,
+    "category": "Accountancy",
+    "text": "When debentures are issued at premium and redeemed at premium, the journal entry will have the following combination :\n(A) Discount on issue of debentures account is credited (B) Loss on issue of debentures account is debited (C) Security premium account is credited (D) Premium on redemption of debentures account is credited\nChoose the correct answer from the options givenbelow :",
+    "options": [
+      "(A), (B) and (D) only",
+      "(A), (B) and (C) only",
+      "(A), (B), (C) and (D)",
+      "(B), (C) and (D) only"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "4"
+  },
+  {
+    "id": 40,
+    "category": "Accountancy",
+    "text": "Match List-I with List-II.\n\nList-I\n(Name of account to be debited or credited, when shares are forfeited)\n(A) Share Capital Account\n(B) Share Forfeited Account\n(C) Calls-in-arrears Account\n(D) Securities Premium Account\n\nList-II\n(Amount to be debited or credited)\n(I) Debited with amount not received\n(II) Credited with amount not received\n(III) Credited with amount received towards share capital\n(IV) Debited with amount called up\nChoose the correct answer from the options given below :",
+    "options": [
+      "(A) - (I), (B) - (II), (C) - (III), (D) - (IV)",
+      "(A) - (IV), (B) - (III), (C) - (II), (D) - (I)",
+      "(A) - (I), (B) - (II), (C) - (IV), (D) - (III)",
+      "(A) - (III), (B) - (IV), (C) - (I), (D) - (II)"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "2"
+  },
+  {
+    "id": 41,
+    "category": "Accountancy",
+    "text": "Arrange the following in the correct sequence in the context of debenture.\n(A) Payment to debenture-holders (B) Creation of DRR (C) Issue of debentures (D) Redemption becomes due\nChoose the correct answer from the options given below :",
+    "options": [
+      "(A), (B), (C), (D)",
+      "(A), (C), (B), (D)",
+      "(B), (A), (D), (C)",
+      "(C), (B), (D), (A)"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "4"
+  },
+  {
+    "id": 42,
+    "category": "Accountancy",
+    "text": "If a delay occurs beyond 8 days in refunding the subscription amount, failing to gather the minimum subscription, from the date of closure of the subscription list, the company shall be liable for interest at the rate of:",
+    "options": ["15%", "12%", "6%", "Prevailing in State Bank of India"],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1"
+  },
+  {
+    "id": 43,
+    "category": "Accountancy",
+    "text": "A company can accept calls in advance, if authorised by:",
+    "options": [
+      "Shareholders",
+      "Board of Directors",
+      "Articles of Association",
+      "Memorandum of Association"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "3"
+  },
+  {
+    "id": 44,
+    "category": "Accountancy",
+    "text": "A, B and C are partners sharing profits in the ratio of 3:2: 1. C died on 1st July, 2023. On this date, final accounts were prepared to ascertain profits for the period. It resulted in a profit of ₹ 1,75,000 to the firm. To give effect to the above :",
+    "options": [
+      "Profit and Loss Account will be debited.",
+      "Profit and Loss Appropriation Account will be debited.",
+      "Profit and Loss Account will be credited.",
+      "Profit and Loss Appropriation Account will be credited."
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "3"
+  },
+  {
+    "id": 45,
+    "category": "Accountancy",
+    "text": "On the date of admission of a partner there was a balance of ₹ 45,000 in the account of machinery. It was found undervalued by 10%. The value of machinery will appear in the new Balance Sheet at:",
+    "options": ["₹49,500", "₹50,000", "₹40,000", "₹40,500"],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "4"
+  },
+  {
+    "id": 46,
+    "category": "Accountancy",
+    "text": "Dividend received is",
+    "options": [
+      "Operating activity",
+      "Financing activity",
+      "Investing activity",
+      "Cash and cash equivalents"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "3"
+  },
+  {
+    "id": 47,
+    "category": "Accountancy",
+    "text": "A partnership can have maximum 50 partners. This limit has been set by the :",
+    "options": [
+      "Indian Partnership Act, 1932",
+      "State Government",
+      "Indian Contract Act, 1872",
+      "Central Government"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "4"
+  },
+  {
+    "id": 48,
+    "category": "Accountancy",
+    "text": "Which of the following is an example of sequential code?",
+    "options": [
+      "Using Code \"CL001\" for \"Accounts of XYZ Ltd\".",
+      "Using Code \"100-199\" for \"Dealers of Small Pumps\".",
+      "Using Code \"SJ\" for \"Sales Journals\".",
+      "Using Code \"HQ\" for \"Headquarters\"."
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1"
+  },
+  {
+    "id": 49,
+    "category": "Accountancy",
+    "text": "If there is no claim against Workmen Compensation Reserve, it is ________ at the time of admission of a partner.\nFill in the blank with the correct answer from the options given below.",
+    "options": [
+      "debited to old partners' capital account.",
+      "credited to all partners' capital accounts.",
+      "credited to old partners' capital accounts.",
+      "debited to all partners' capital accounts."
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "3"
+  },
+  {
+    "id": 50,
+    "category": "Accountancy",
+    "text": "A, B and C are partners sharing profits in the ratio of 3:3:4. They decide to share the future profits equally. The sacrifice or gain of partners are:",
+    "options": [
+      "A gains 1/30; B gains 1/30; C sacrifices 2/30",
+      "A gains 2/30; B gains 1/30; C sacrifices 3/30",
+      "A sacrifices 1/30; B gains 3/30; C sacrifices 2/30",
+      "A gains 2/30; B gains 3/30; C sacrifices 5/30"
+    ],
+    "selected": null,
+    "status": "notVisited",
+    "correctAnswer": "1"
+  }
+        ];
+        
+        let currentQuestionIndex = 0;
+        const totalSeconds = 3600;
+        let remainingSeconds = totalSeconds;
+        let timerInterval;
+        let quizStarted = false;
+        let isPaused = false;
+        
+        const questionCategoryEl = document.getElementById("question-category");
+        const questionNumberEl = document.getElementById("question-number");
+        const questionTextEl = document.getElementById("question-text");
+        const optionsEl = document.getElementById("options");
+        const timerDisplayEl = document.getElementById("timer-display");
+        const navGridEl = document.getElementById("nav-grid");
+        const pauseButton = document.getElementById("pause-button");
+        
+        const markReviewNextBtn = document.getElementById("markReviewNext");
+        const clearResponseBtn = document.getElementById("clearResponse");
+        const prevBtn = document.getElementById("prevBtn");
+        const saveNextBtn = document.getElementById("saveNext");  
+        const submitBtn = document.getElementById("submitBtn");
+        const navPrevBtn = document.getElementById("nav-prev");
+        const navNextBtn = document.getElementById("nav-next");
+
+        const resultsPageEl = document.getElementById("results-page");
+        const resultsSummaryEl = document.getElementById("results-summary");
+        const resultsDetailsEl = document.getElementById("results-details");
+        
+        const navButtons = document.querySelectorAll(".nav-btn");
+        navButtons.forEach(btn => {
+            btn.addEventListener("click", function() {
+                const index = parseInt(this.getAttribute("data-index"));
+                currentQuestionIndex = index;
+                displayQuestion();
+            });
+        });
+        
+        startQuizButton.addEventListener("click", function() {
+            startPageEl.style.display = "none";
+            quizContainerEl.style.display = "block";
+            quizStarted = true;
+            startTimer();
+            displayQuestion();
+        });
+
+        function displayQuestion() {
+            if (!quizStarted) return;
+            const question = questions[currentQuestionIndex];
+             if(question.status === "notVisited") {
+                question.status = "notAttempted";
+            }
+            questionCategoryEl.textContent = question.category;
+            questionNumberEl.textContent = "Question No. " + question.id;
+            questionTextEl.textContent = question.text;
+            
+            optionsEl.innerHTML = "";
+            if (question.options.length > 0) {
+                question.options.forEach((option, i) => {
+                    const optionId = "option_" + i;
+                    const label = document.createElement("label");
+                    label.className = "flex items-center py-2 cursor-pointer";
+                    
+                    const input = document.createElement("input");
+                    input.type = "radio";
+                    input.name = "answer";
+                    input.className = "w-5 h-5 mr-3";
+                    input.id = optionId;
+                    input.value = option;
+                    if(question.selected === option) {
+                        input.checked = true;
+                    }
+                    input.addEventListener("change", function() {
+                        question.selected = this.value;
+                    });
+                    
+                    const span = document.createElement("span");
+                    span.className = "text-lg text-gray-700 leading-relaxed";
+                    span.textContent = option;
+                    
+                    label.appendChild(input);
+                    label.appendChild(span);
+                    optionsEl.appendChild(label);
+                });
+            } else {
+                const input = document.createElement("input");
+                input.type = "text";
+                input.placeholder = "Type your answer here...";
+                input.className = "border border-gray-300 rounded p-2 w-full";
+                input.value = question.answer || "";
+                input.addEventListener("input", function() {
+                    question.answer = this.value;
+                });
+                optionsEl.appendChild(input);
+            }
+            updateNavButtons();
+        }
+        
+        function updateNavButtons() {
+            navButtons.forEach(btn => {
+                const index = parseInt(btn.getAttribute("data-index"));
+                const q = questions[index];
+                 if(q.status === "notAttempted") {
+                    btn.className = "nav-btn bg-red-500 hover:opacity-75 transition text-white p-2 rounded";
+                } else if(q.status === "answered") {
+                    btn.className = "nav-btn bg-green-500 hover:opacity-75 transition text-white p-2 rounded";
+                } else if(q.status === "markedForReview") {
+                    btn.className = "nav-btn bg-purple-500 hover:opacity-75 transition text-white p-2 rounded";
+                } else {
+                    btn.className = "nav-btn bg-gray-200 hover:opacity-75 transition p-2 rounded";
+                }
+            });
+        }
+        
+        function startTimer() {
+            timerInterval = setInterval(function() {
+                if(remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timerDisplayEl.textContent = "Time Over";
+                    submitQuiz();
+                } else {
+                    remainingSeconds--;
+                    const minutes = Math.floor(remainingSeconds / 60);
+                    const seconds = remainingSeconds % 60;
+                    timerDisplayEl.textContent = "Time Left : " + minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
+                }
+            }, 1000);
+        }
+        
+        function pauseTimer() {
+            if (!isPaused) {
+                clearInterval(timerInterval);
+                pauseButton.textContent = "Resume";
+                isPaused = true;
+            } else {
+                startTimer();
+                pauseButton.textContent = "Pause";
+                isPaused = false;
+            }
+        }
+        
+        pauseButton.addEventListener("click", function() {
+            pauseTimer();
+        });
+        
+        markReviewNextBtn.addEventListener("click", function() {
+            const question = questions[currentQuestionIndex];
+             if (question.status === "markedForReview") {
+                question.status = "notAttempted";
+            } else {
+                 question.status = "markedForReview";
+            }
+            if(currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        });
+        
+        clearResponseBtn.addEventListener("click", function() {
+            const question = questions[currentQuestionIndex];
+            question.selected = null;
+            question.answer = "";
+            const radios = document.getElementsByName("answer");
+            radios.forEach(radio => radio.checked = false);
+            const input = optionsEl.querySelector("input[type='text']");
+            if (input) {
+                input.value = "";
+            }
+             question.status = "notAttempted";
+            updateNavButtons();
+        });
+        
+        prevBtn.addEventListener("click", function() {
+            if(currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        });
+        
+        saveNextBtn.addEventListener("click", function() {
+            const question = questions[currentQuestionIndex];
+            if(question.selected || question.answer) {
+                question.status = "answered";
+            } else {
+                 question.status = "notAttempted"; // Or do nothing, depending on desired behavior
+            }
+            if(currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        });
+        
+        submitBtn.addEventListener("click", function() {
+            submitQuiz();
+        });
+        
+        function submitQuiz() {
+            clearInterval(timerInterval);
+
+            let correctCount = 0;
+            let incorrectCount = 0;
+            let unattemptedCount = 0;
+            const incorrectQuestions = [];
+             const correctQuestions = [];
+
+            questions.forEach(q => {
+                if (q.status === "answered") {
+                    if (q.options.length > 0) {
+                         if (q.selected === q.correctAnswer) {
+                            correctCount++;
+                            correctQuestions.push(q.id);
+                        } else {
+                            incorrectCount++;
+                             incorrectQuestions.push({ id: q.id, correctAnswer: q.correctAnswer });
+                        }
+                    } else {
+                         if (q.answer.trim().toLowerCase() === q.correctAnswer.toLowerCase()) {
+                            correctCount++;
+                            correctQuestions.push(q.id);
+                        } else {
+                            incorrectCount++;
+                            incorrectQuestions.push({ id: q.id, correctAnswer: q.correctAnswer });
+                        }
+                    }
+                } else {
+                    unattemptedCount++;
+                }
+            });
+        
+            const totalScore = (correctCount * 3) - incorrectCount;
+            let resultMessage = `Total Score: ${totalScore}<br>`;
+            resultMessage += `Correct: ${correctCount} (+${correctCount * 3})<br>`;
+            resultMessage += `Incorrect: ${incorrectCount} (-${incorrectCount})<br>`;
+            resultMessage += `Unattempted: ${unattemptedCount}<br>`;
+        
+            resultsSummaryEl.innerHTML = resultMessage;
+        
+            let detailsMessage = "";
+             if (correctQuestions.length > 0) {
+                detailsMessage += `Correct Questions: ${correctQuestions.join(", ")}<br>`;
+            }
+            if (incorrectQuestions.length > 0) {
+                detailsMessage += `Incorrect Questions:<br>`;
+                incorrectQuestions.forEach(q => {
+                    detailsMessage += `Question ${q.id}: Correct Answer is "${q.correctAnswer}"<br>`;
+                });
+            }
+            resultsDetailsEl.innerHTML = detailsMessage;
+            resultsPageEl.style.display = "block";
+            quizContainerEl.style.display = 'none';
+            quizStarted = false;
+        }
+        
+        navPrevBtn.addEventListener("click", function() {
+            if (!quizStarted) return;
+            if(currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        });
+        
+        navNextBtn.addEventListener("click", function() {
+            if (!quizStarted) return;
+            if(currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        });
+
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            remainingSeconds = totalSeconds;
+            clearInterval(timerInterval);
+            questions.forEach(q => {
+                q.selected = null;
+                q.answer = "";
+                q.status = "notVisited";
+            });
+            resultsPageEl.style.display = "none";
+            startPageEl.style.display = "block";
+            quizContainerEl.style.display = "none";
+            quizStarted = false;
+            isPaused = false;
+            pauseButton.textContent = "Pause";
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            timerDisplayEl.textContent = "Time Left : 60:00";
+        }
+    });
+</script>
+</body>
+</html>
+
